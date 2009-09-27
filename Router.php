@@ -14,7 +14,7 @@ class Johnny_Router
 	{
 		$vars = array();
 		
-		if (is_array($pattern)) {	// it's not really pattern, rather list of variable names
+		if (is_array($pattern)) {	// it's not really a pattern, rather list of variable names
 			foreach ($pattern as $name) {
 				$vars[$name] = isset($args[$name]) ? $args[$name] : null;
 			}
@@ -63,6 +63,14 @@ class Johnny_Router
 					$result[$name] = $matches[$i];
 					$i += 1 + substr_count($re, '(');
 				}
+				if (isset($route['options']['onMatch'])) {
+					$ret = call_user_func($route['options']['onMatch'], $result);
+					if ($ret === true) {
+						return $result;
+					} elseif ($ret === false) {
+						continue;
+					}
+				}
 				return $result;
 			}
 		}
@@ -75,9 +83,9 @@ class Johnny_Router
 				if (isset($route['options']['onCreate'])) {
 					$ret = call_user_func($route['options']['onCreate'], $this, $args);
 					if ($ret === false) {
-						continue;	// try to find another route
+						continue;		// try to find another route
 					} elseif ($ret === true) {
-						;			// use this route's pattern
+						;				// use this route's pattern
 					} else {
 						return $ret;	// callback returned generated URL
 					}

@@ -69,5 +69,14 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$item = array('id' => 12, 'slug' => 'my-test');
 		$this->assertEquals($r->createUrl(array('action' => 'show', 'item' => $item)), '/news/12/my-test');
 	}
+
+	public function testOnMatch() {
+		$r = new Johnny_Router();
+		$fn = create_function('$args', 'return false;');
+		$r->connect('/test', array('action' => 'test1'), array('onMatch' => $fn));
+		$r->connect('/test', array('action' => 'test2'));
+		
+		$this->assertEquals($r->match('/test'), array('action' => 'test2'));
+	}
 }
 
