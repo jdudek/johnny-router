@@ -3,7 +3,6 @@
 /*
 
 TODO
- * pozbyc sie wymogu podawania zmiennych parametrow w args
  * filtry
  * wlasne re argumentow
 */
@@ -16,21 +15,27 @@ class Johnny_Router
 	 *   [0] => array(
 	 *     'pattern' =>
 	 *     'args' => array(
-	 *       ['xyz'] => array(re => ... | const => ... | var => true)
+	 *       ['xyz'] => array(re => ... | const => ...)
 	 *     )
 	 *     'options' => array()
 	 *   )
 	 * )
 	 */
 	protected $routes = array();
+	
+	protected $argNameRe = '/\:([a-zA-Z0-9_]+)/';
+	
+	protected $defaultArgRe = '.*?';
 
 	public function connect($pattern, $args, $options = array())
 	{
 		$routeArgs = array();
+		preg_match_all($this->argNameRe, $pattern, $matches);
+		foreach ($matches[1] as $argName) {
+			$routeArgs[$argName] = array('re' => $this->defaultArgRe);
+		}
 		foreach ($args as $k => $v) {
-			if (is_integer($k)) {
-				$routeArgs[$v] = array('var' => true);
-			} else if (is_array($v)) {
+			if (is_array($v)) {
 				$routeArgs[$k] = $v;
 			} else {
 				$routeArgs[$k] = array('const' => $v);
@@ -42,17 +47,16 @@ class Johnny_Router
 	public function match($request)
 	{
 		foreach ($this->routes as $route) {
-			preg_match_all('/\:([a-zA-Z0-9_]+)/', $route['pattern'], $matches);
-			$patternArgs = $matches[1];
-			$re = '#^' . preg_replace('/\:[a-zA-Z0-9_]+/', '(.*?)', $route['pattern']) . '$#';
+			$re = '#^' . preg_replace($this->argNameRe, '(.*?)', $route['pattern']) . '$#';
 			if (preg_match($re, $request, $matches)) {
 				$result = array();
 				foreach ($route['args'] as $k => $v) {
 					if (isset($v['const'])) $result[$k] = $v['const'];
 				}
-				if (count($patternArgs) > 0) {
+				$varArgs = $this->getVarArgs($route);
+				if (count($varArgs) > 0) {
 					array_shift($matches);
-					$result = array_merge($result, array_combine($patternArgs, $matches));
+					$result = array_merge($result, array_combine($varArgs, $matches));
 				}
 				return $result;
 			}
@@ -79,5 +83,13 @@ class Johnny_Router
 			unset($givenArgs[$k]);
 		}
 		return empty($givenArgs);
+	}
+	
+	protected function getVarArgs($route) {
+		$a = array();
+		foreach ($route['args'] as $name => $arg) {
+			if (!empty($arg['var'])) $a[] = $name;
+		}
+		return $a;
 	}
 }
