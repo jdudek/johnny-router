@@ -16,6 +16,8 @@ class Johnny_Router
 	 */
 	protected $routes = array();
 	
+	protected $aliases = array();
+	
 	protected $varNameRe = '/\:([a-zA-Z0-9_]+)/';
 	
 	protected $defaultVarRe = '.*?';
@@ -81,6 +83,20 @@ class Johnny_Router
 				return $result;
 			}
 		}
+	}
+	
+	public function alias($name, $args = array(), $names = array())
+	{
+		$this->aliases[$name] = array('args' => $args, 'names' => $names);
+	}
+	
+	public function fromAlias($name, $givenArgs = array())
+	{
+		$args = $this->aliases[$name]['args'];
+		if (count($givenArgs) > 0) {
+			$args = array_merge($args, array_combine($this->aliases[$name]['names'], $givenArgs));
+		}
+		return $this->url($args);
 	}
 	
 	protected function matchArgs($route, $givenArgs) {
