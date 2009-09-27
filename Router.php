@@ -2,35 +2,28 @@
 
 class Johnny_Router
 {
-	/**
-	 *
-	 * array(
-	 *   [0] => array(
-	 *     'pattern' =>
-	 *     'vars' => array()
-	 *     'consts' => array()
-	 *     'options' => array()
-	 *     're' => 
-	 *   )
-	 * )
-	 */
 	protected $routes = array();
 	
 	protected $aliases = array();
 	
 	protected $varNameRe = '/\:([a-zA-Z0-9_]+)/';
 	
-	protected $defaultVarRe = '.*?';
-
+	public $defaultRe = '.*?';
+	
 	public function connect($pattern, $args = array(), $options = array())
 	{
 		$vars = array();
-		preg_match_all($this->varNameRe, $pattern, $matches);
-		foreach ($matches[1] as $name) {
-			if (isset($args[$name])) {
-				$vars[$name] = $args[$name];
-			} else {
-				$vars[$name] = $this->defaultVarRe;
+		
+		if (is_array($pattern)) {	// it's not really pattern, rather list of variable names
+			foreach ($pattern as $name) {
+				$vars[$name] = isset($args[$name]) ? $args[$name] : null;
+			}
+			$pattern = null;
+			$routeRe = null;
+		} else {
+			preg_match_all($this->varNameRe, $pattern, $matches);
+			foreach ($matches[1] as $name) {
+				$vars[$name] = isset($args[$name]) ? $args[$name] : null;
 			}
 		}
 		
@@ -41,11 +34,14 @@ class Johnny_Router
 			}
 		}
 		
-		$routeRe = "#^$pattern$#";
-		$sortedVars = $vars;
-		krsort($sortedVars);
-		foreach ($sortedVars as $name => $varRe) {
-			$routeRe = str_replace(":$name", "($varRe)", $routeRe);
+		if ($pattern) {
+			$routeRe = "#^$pattern$#";
+			$sortedVars = $vars;
+			krsort($sortedVars);
+			foreach ($sortedVars as $name => $varRe) {
+				if (!isset($varRe)) $varRe = $this->defaultRe;
+				$routeRe = str_replace(":$name", "($varRe)", $routeRe);
+			}
 		}
 		
 		array_push($this->routes, array(
@@ -60,7 +56,7 @@ class Johnny_Router
 	public function match($request)
 	{
 		foreach ($this->routes as $route) {
-			if (preg_match($route['re'], $request, $matches)) {
+			if ($route['re'] && preg_match($route['re'], $request, $matches)) {
 				$result = $route['consts'];
 				$i = 1;
 				foreach ($route['vars'] as $name => $re) {
@@ -76,6 +72,17 @@ class Johnny_Router
 	{
 		foreach ($this->routes as $route) {
 			if ($this->matchArgs($route, $args)) {
+				if (isset($route['options']['onCreate'])) {
+					$ret = call_user_func($route['options']['onCreate'], $this, $args);
+					if ($ret === false) {
+						continue;	// try to find another route
+					} elseif ($ret === true) {
+						;			// use this route's pattern
+					} else {
+						return $ret;	// callback returned generated URL
+					}
+				}
+
 				$result = $route['pattern'];
 				foreach ($args as $k => $v) {
 					$result = str_replace(':'.$k, $v, $result);
@@ -96,7 +103,7 @@ class Johnny_Router
 		if (count($givenArgs) > 0) {
 			$args = array_merge($args, array_combine($this->aliases[$name]['names'], $givenArgs));
 		}
-		return $this->url($args);
+		return $this->createUrl($args);
 	}
 	
 	protected function matchArgs($route, $givenArgs)
@@ -107,7 +114,7 @@ class Johnny_Router
 		}
 		foreach ($route['vars'] as $k => $v) {
 			if (!isset($givenArgs[$k])) return false;
-			if ($v != $this->defaultVarRe && !preg_match("#$v#", $givenArgs[$k])) return false;
+			if (isset($v) && !preg_match("#$v#", $givenArgs[$k])) return false;
 			unset($givenArgs[$k]);
 		}
 		return empty($givenArgs);

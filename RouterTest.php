@@ -51,5 +51,23 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($r->fromAlias('list'), '/news');
 		$this->assertEquals($r->fromAlias('show', array(12)), '/news/12');
 	}
+	
+	public function testOnCreate() {
+		$r = new Johnny_Router();
+		
+		$fn = create_function('$r, $args', '
+			$args["id"] = $args["item"]["id"];
+			$args["slug"] = $args["item"]["slug"];
+			unset($args["item"]);
+			return $r->createUrl($args);
+		');
+		
+		$r->connect('/news', array('action' => 'list'));
+		$r->connect('/news/:id/:slug', array('action' => 'show', 'id' => '\d+'));
+		$r->connect(array('item'), array('action' => 'show'), array('onCreate' => $fn));
+		
+		$item = array('id' => 12, 'slug' => 'my-test');
+		$this->assertEquals($r->createUrl(array('action' => 'show', 'item' => $item)), '/news/12/my-test');
+	}
 }
 
