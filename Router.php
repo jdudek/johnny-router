@@ -99,7 +99,8 @@ class Johnny_Router
 		return $this->url($args);
 	}
 	
-	protected function matchArgs($route, $givenArgs) {
+	protected function matchArgs($route, $givenArgs)
+	{
 		foreach ($route['consts'] as $k => $v) {
 			if (!isset($givenArgs[$k]) || $givenArgs[$k] != $v) return false;
 			unset($givenArgs[$k]);
