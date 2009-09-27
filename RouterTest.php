@@ -19,9 +19,9 @@ class RouterTest extends PHPUnit_Framework_TestCase
 		$r->connect('/news', array('action' => 'list'));
 		$r->connect('/news/:id', array('action' => 'show'));
 
-		$this->assertEquals($r->url(array('action' => 'list')), '/news');
-		$this->assertEquals($r->url(array('action' => 'show', 'id' => 12)), '/news/12');
-		$this->assertEquals($r->url(array('action' => 'show', 'wtf' => 37)), null);
+		$this->assertEquals($r->createUrl(array('action' => 'list')), '/news');
+		$this->assertEquals($r->createUrl(array('action' => 'show', 'id' => 12)), '/news/12');
+		$this->assertEquals($r->createUrl(array('action' => 'show', 'wtf' => 37)), null);
 	}
 
 	public function testRouteWithRe() {

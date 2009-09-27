@@ -72,7 +72,7 @@ class Johnny_Router
 		}
 	}
 	
-	public function url($args)
+	public function createUrl($args)
 	{
 		foreach ($this->routes as $route) {
 			if ($this->matchArgs($route, $args)) {
