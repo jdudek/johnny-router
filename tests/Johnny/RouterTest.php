@@ -1,9 +1,9 @@
 <?php
 
 require 'PHPUnit/Framework.php';
-require './Router.php';
+require dirname(__FILE__) . '/../../lib/Johnny/Router.php';
 
-class RouterTest extends PHPUnit_Framework_TestCase
+class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 {
 	public function testMatch() {
 		$r = new Johnny_Router();
