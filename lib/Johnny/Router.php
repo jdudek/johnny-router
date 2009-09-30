@@ -13,7 +13,6 @@ class Johnny_Router
 	public function connect($pattern, $args = array(), $options = array())
 	{
 		$vars = array();
-		
 		if (is_array($pattern)) {	// it's not really a pattern, rather list of variable names
 			foreach ($pattern as $name) {
 				$vars[$name] = isset($args[$name]) ? $args[$name] : null;
@@ -102,6 +101,7 @@ class Johnny_Router
 				return $result;
 			}
 		}
+		throw new Johnny_Router_Exception('createUrl failed for: ' . implode(', ', array_keys($args)));
 	}
 	
 	public function alias($name, $args = array(), $names = array())
@@ -111,6 +111,9 @@ class Johnny_Router
 	
 	public function fromAlias($name, $givenArgs = array())
 	{
+		if (!isset($this->aliases[$name])) {
+			throw new Johnny_Router_Exception('Undefined alias: ' . $name);
+		}
 		$args = $this->aliases[$name]['args'];
 		if (count($givenArgs) > 0) {
 			$args = array_merge($args, array_combine($this->aliases[$name]['names'], $givenArgs));

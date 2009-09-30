@@ -2,6 +2,7 @@
 
 require 'PHPUnit/Framework.php';
 require dirname(__FILE__) . '/../../lib/Johnny/Router.php';
+require dirname(__FILE__) . '/../../lib/Johnny/Router/Exception.php';
 
 class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 {
@@ -21,7 +22,11 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($r->createUrl(array('action' => 'list')), '/news');
 		$this->assertEquals($r->createUrl(array('action' => 'show', 'id' => 12)), '/news/12');
-		$this->assertEquals($r->createUrl(array('action' => 'show', 'wtf' => 37)), null);
+		try {
+			$r->createUrl(array('action' => 'show', 'wtf' => 37));
+			$this->fail();
+		} catch (Johnny_Router_Exception $e) {
+		}
 	}
 
 	public function testRouteWithRe() {
@@ -50,6 +55,11 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($r->fromAlias('list'), '/news');
 		$this->assertEquals($r->fromAlias('show', array(12)), '/news/12');
+		try {
+			$r->fromAlias('test');
+			$this->fail();
+		} catch (Johnny_Router_Exception $e) {
+		}
 	}
 
 	public function testAliasesWithinConnect() {
@@ -83,6 +93,15 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 		$r->connect('/test', array('action' => 'test2'));
 		
 		$this->assertEquals($r->match('/test'), array('action' => 'test2'));
+	}
+
+	public function testCreateUrlFailure() {
+		$r = new Johnny_Router();
+		try {
+			$r->createUrl(array('action' => 'list'));
+			$this->fail();
+		} catch (Johnny_Router_Exception $e) {
+		}
 	}
 }
 
