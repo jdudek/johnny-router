@@ -1,1 +1,3 @@
-- match/createUrl callbacks
+- error handling (exceptions)
+- serialization
+- defining aliases within connect()
