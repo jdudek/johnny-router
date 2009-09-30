@@ -51,6 +51,10 @@ class Johnny_Router
 			're' => $routeRe,
 			'options' => $options
 		));
+		
+		if (isset($options['alias'])) {
+			$this->alias($options['alias'], $consts, array_keys($vars));
+		}
 	}
 	
 	public function match($request)
