@@ -120,6 +120,20 @@ class Johnny_Router
 		}
 		return $this->createUrl($args);
 	}
+
+	public function url()
+	{
+		$args = func_get_args();
+		if (empty($args)) {
+			throw new Johnny_Router_Exception('No arguments given to url().');
+		}
+		$first = array_shift($args);
+		if (is_array($first)) {
+			return $this->createUrl($first);
+		} else if (is_string($first)) {
+			return $this->fromAlias($first, $args);
+		}
+	}
 	
 	protected function matchArgs($route, $givenArgs)
 	{

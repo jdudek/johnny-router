@@ -103,5 +103,15 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 		} catch (Johnny_Router_Exception $e) {
 		}
 	}
+	
+	public function testUrlShortcut() {
+		$r = new Johnny_Router();
+		$r->connect('/news', array('action' => 'list'));
+		$r->connect('/news/:id', array('action' => 'show'));
+		$r->alias('show', array('action' => 'show'), array('id'));
+		
+		$this->assertEquals($r->url(array('action' => 'list')), '/news');
+		$this->assertEquals($r->url('show', 12), '/news/12');
+	}
 }
 
