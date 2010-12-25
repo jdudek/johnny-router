@@ -112,5 +112,15 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($r->url(array('action' => 'list')), '/news');
 		$this->assertEquals($r->url('show', 12), '/news/12');
 	}
-}
 
+	public function testNullInParameteres()
+	{
+		$r = new Johnny_Router();
+		$r->connect('/news', array('action' => 'list'));
+		$r->connect('/news/:category', array('action' => 'list'));
+
+		$this->assertEquals($r->url(array('action' => 'list')), '/news');
+		$this->assertEquals($r->url(array('action' => 'list', 'category' => 'test')), '/news/test');
+		$this->assertEquals($r->url(array('action' => 'list', 'category' => null)), '/news');
+	}
+}

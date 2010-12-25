@@ -146,6 +146,9 @@ class Johnny_Router
 			if (isset($v) && !preg_match("#$v#", $givenArgs[$k])) return false;
 			unset($givenArgs[$k]);
 		}
+		foreach ($givenArgs as $k => $v) {
+			if (is_null($givenArgs[$k])) unset($givenArgs[$k]);
+		}
 		return empty($givenArgs);
 	}
 }
