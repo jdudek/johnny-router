@@ -3,13 +3,13 @@
 class Johnny_Router
 {
 	protected $routes = array();
-	
+
 	protected $aliases = array();
-	
+
 	protected $varNameRe = '/\:([a-zA-Z0-9_]+)/';
-	
+
 	public $defaultRe = '.*?';
-	
+
 	public function connect($pattern, $args = array(), $options = array())
 	{
 		$vars = array();
@@ -25,14 +25,14 @@ class Johnny_Router
 				$vars[$name] = isset($args[$name]) ? $args[$name] : null;
 			}
 		}
-		
+
 		$consts = array();
 		foreach ($args as $k => $v) {
 			if (!isset($vars[$k])) {
 				$consts[$k] = $v;
 			}
 		}
-		
+
 		if ($pattern) {
 			$routeRe = "#^$pattern$#";
 			$sortedVars = $vars;
@@ -42,7 +42,7 @@ class Johnny_Router
 				$routeRe = str_replace(":$name", "($varRe)", $routeRe);
 			}
 		}
-		
+
 		array_push($this->routes, array(
 			'pattern' => $pattern,
 			'vars' => $vars,
@@ -50,12 +50,12 @@ class Johnny_Router
 			're' => $routeRe,
 			'options' => $options
 		));
-		
+
 		if (isset($options['alias'])) {
 			$this->alias($options['alias'], $consts, array_keys($vars));
 		}
 	}
-	
+
 	public function match($request)
 	{
 		foreach ($this->routes as $route) {
@@ -78,7 +78,7 @@ class Johnny_Router
 			}
 		}
 	}
-	
+
 	public function createUrl($args)
 	{
 		foreach ($this->routes as $route) {
@@ -103,12 +103,12 @@ class Johnny_Router
 		}
 		throw new Johnny_Router_Exception('createUrl failed for: ' . implode(', ', array_keys($args)));
 	}
-	
+
 	public function alias($name, $args = array(), $names = array())
 	{
 		$this->aliases[$name] = array('args' => $args, 'names' => $names);
 	}
-	
+
 	public function fromAlias($name, $givenArgs = array())
 	{
 		if (!isset($this->aliases[$name])) {
@@ -134,7 +134,7 @@ class Johnny_Router
 			return $this->fromAlias($first, $args);
 		}
 	}
-	
+
 	protected function matchArgs($route, $givenArgs)
 	{
 		foreach ($route['consts'] as $k => $v) {

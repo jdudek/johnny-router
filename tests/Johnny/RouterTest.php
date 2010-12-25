@@ -14,7 +14,7 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($r->match('/news'), array('action' => 'list'));
 		$this->assertEquals($r->match('/news/12'), array('action' => 'show', 'id' => 12));
 	}
-	
+
 	public function testCreateUrl() {
 		$r = new Johnny_Router();
 		$r->connect('/news', array('action' => 'list'));
@@ -67,21 +67,21 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 		$r->connect('/news/:id', array('action' => 'show'), array('alias' => 'show'));
 		$this->assertEquals($r->fromAlias('show', array(12)), '/news/12');
 	}
-	
+
 	public function testOnCreate() {
 		$r = new Johnny_Router();
-		
+
 		$fn = create_function('$r, $args', '
 			$args["id"] = $args["item"]["id"];
 			$args["slug"] = $args["item"]["slug"];
 			unset($args["item"]);
 			return $r->createUrl($args);
 		');
-		
+
 		$r->connect('/news', array('action' => 'list'));
 		$r->connect('/news/:id/:slug', array('action' => 'show', 'id' => '\d+'));
 		$r->connect(array('item'), array('action' => 'show'), array('onCreate' => $fn));
-		
+
 		$item = array('id' => 12, 'slug' => 'my-test');
 		$this->assertEquals($r->createUrl(array('action' => 'show', 'item' => $item)), '/news/12/my-test');
 	}
@@ -91,7 +91,7 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 		$fn = create_function('$args', 'return false;');
 		$r->connect('/test', array('action' => 'test1'), array('onMatch' => $fn));
 		$r->connect('/test', array('action' => 'test2'));
-		
+
 		$this->assertEquals($r->match('/test'), array('action' => 'test2'));
 	}
 
@@ -103,13 +103,13 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 		} catch (Johnny_Router_Exception $e) {
 		}
 	}
-	
+
 	public function testUrlShortcut() {
 		$r = new Johnny_Router();
 		$r->connect('/news', array('action' => 'list'));
 		$r->connect('/news/:id', array('action' => 'show'));
 		$r->alias('show', array('action' => 'show'), array('id'));
-		
+
 		$this->assertEquals($r->url(array('action' => 'list')), '/news');
 		$this->assertEquals($r->url('show', 12), '/news/12');
 	}
