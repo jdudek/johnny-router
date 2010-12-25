@@ -173,6 +173,16 @@ Usage example:
 	$r->url(array('action' => 'PubNewsShow', 'item' => $news))
 	$r->url('PubNewsShow', $news)
 
+### Implicit constants
+
+Sometimes it's useful to have an additional constant returned by `match`, but also not having to pass that constant to `createUrl`. This is what implicit constants are for.
+
+	$r->connect('/news/', array('action' => 'NewsList'), array(
+		'implicit' => array('category' => 'test')
+	)
+	$r->match('/news/') => array('action' => 'NewsList', 'category' => 'test')
+	$r->url(array('action' => 'NewsList')) => '/news/'
+
 ## Notes
 
 Johnny_Router was not optimized at all. If you need to create many URLs on one page (a few thousands), it may turn out to be too slow. However, I think optimizing the router is not really hard (you could index the routes by one of the constants, so you wouldn't need to call `matchArgs` for all the rules).

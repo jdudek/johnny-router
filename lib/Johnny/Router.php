@@ -68,11 +68,12 @@ class Johnny_Router
 				}
 				if (isset($route['options']['onMatch'])) {
 					$ret = call_user_func($route['options']['onMatch'], $result);
-					if ($ret === true) {
-						return $result;
-					} elseif ($ret === false) {
+					if ($ret === false) {
 						continue;
 					}
+				}
+				if (isset($route['options']['implicit'])) {
+					$result = $result + $route['options']['implicit'];
 				}
 				return $result;
 			}
