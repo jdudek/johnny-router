@@ -1,6 +1,5 @@
 <?php
 
-require 'PHPUnit/Framework.php';
 require dirname(__FILE__) . '/../../lib/Johnny/Router.php';
 require dirname(__FILE__) . '/../../lib/Johnny/Router/Exception.php';
 
