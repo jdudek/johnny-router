@@ -2,11 +2,11 @@
 
 This little project is my solution to the problem of routing URLs to application actions and, conversely, generating URLs in PHP applications. In short, it translates strings to arrays and back.
 
-My goals when writing this library was to build something simple, lightweight and to avoid any implicit "magic".
+My goals when writing this library were to build something simple, lightweight and to avoid any implicit "magic".
 
 ## How to use
 
-The router exposes three most important methods:
+Three most important methods exposed by the router are:
 
 * `connect($path, $params, $options)` - define new rule
 * `match($path)` - translate URL (string) to an array
@@ -33,7 +33,7 @@ Then:
 
 ### Parameter expressions
 
-Any occurrence in the form of `:name` (e.g. `:id`) in the pattern is replaced by regular expression. By default it is `.*?` which will catch any string.
+Any occurrence of the form `:name` (e.g. `:id`) in the pattern is replaced by regular expression. By default it is `.*?` which will catch any string.
 
 You can replace it with something else, e.g:
 
@@ -50,7 +50,7 @@ The regular expression will by wrapped in parentheses. Please do not use parenth
 
 ### Constants
 
-As you can see, when the router matches URL with one of the patterns, it may pass some constants, like `action` in the previous examples. (`action` is not any special type of variable, you can use any other name, or, for example, pass `controller` as well).
+As you can see, when the router matches URL with one of the patterns, it may pass some constants, like `action` in the previous examples. (`action` is not any special type of constant, you can use any other name, or, for example, pass `controller` as well).
 
 To sum up, there are two types of elements in the `$params` array that you pass to the `connect()` method:
 
@@ -100,15 +100,15 @@ If you define you routes like this, when calling `createUrl`, you don't need to 
 	$r->connect('/post/:id/:title/', array('action' => 'PostShow', 'id' => '\d+'))
 	$r->connect(array('post'), array('action' => 'PostShow'), array('onCreate' => 'filterPost')
 
-In such situation, calling 
+In such situation, the following call:
 
 	$r->createUrl(array('action' => 'PostShow', 'post' => $post))
 
-Will be handled like this:
+will be handled this way:
 
-* router will examine all the rules and find, that it may use the rule, in which there is a constant `'action' => 'PostShow'` and the `post` variable
-* for this rule there is `onCreate` function, so the router will run it, passing itself and the arguments array
-* `onCreate` extracts post's id and title and runs the router again
+* router will examine all the rules and find out, that it may use the rule, in which there is a constant `'action' => 'PostShow'` and the `post` variable
+* for this rule there is an `onCreate` callback function, so the router will run it, passing itself and the arguments array
+* the callback function extracts post's id and title, and runs the router again
 * this time the router finds a rule without `onCreate` and returns `/post/69/my-post/`
 
 At any time, you can change the URLs scheme so it includes post's creation date or anything else, without any changes to your views and controllers.
@@ -128,7 +128,7 @@ The router will internally run:
 
 	$r->createUrl(array('action' => 'AbcAction', 'id' => 12))
 
-Well, so far it doesn't look shorter. But the router provides also one more method, called `url`, which let's you use both styles of creating URLs (with arrays and with aliases). The following examples are equivalent:
+Well, so far it doesn't look much shorter. But the router provides also one more method, called `url`, which let's you use both styles of creating URLs (with arrays and with aliases). The following examples are equivalent:
 
 	$r->url('AbcAlias', 12)
 	$r->url(array('action' => 'AbcAction', 'id' => 12))
