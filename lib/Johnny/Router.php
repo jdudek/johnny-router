@@ -101,7 +101,9 @@ class Johnny_Router
 				return $result;
 			}
 		}
-		throw new Johnny_Router_Exception('createUrl failed for: ' . implode(', ', array_keys($args)));
+		throw new Johnny_Router_Exception('createUrl failed for: ' .
+			implode(', ', array_keys($args)) . '; ' .
+			implode(', ', array_values($args)));
 	}
 
 	public function alias($name, $args = array(), $names = array())

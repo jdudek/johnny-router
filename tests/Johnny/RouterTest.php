@@ -123,4 +123,15 @@ class Johnny_RouterTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($r->url(array('action' => 'list', 'category' => 'test')), '/news/test');
 		$this->assertEquals($r->url(array('action' => 'list', 'category' => null)), '/news');
 	}
+
+	public function testCreateUrlExceptionMessage()
+	{
+		$r = new Johnny_Router();
+		try {
+			$r->createUrl(array('action' => 'show', 'id' => 12));
+			$this->fail();
+		} catch (Johnny_Router_Exception $e) {
+			$this->assertEquals($e->getMessage(), 'createUrl failed for: action, id; show, 12');
+		}
+	}
 }
